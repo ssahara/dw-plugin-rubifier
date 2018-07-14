@@ -95,8 +95,9 @@ class helper_plugin_rubifier extends DokuWiki_Plugin {
         } elseif ($c) {
             $ret = 'Group-ruby';
         } else {
-          //return false;
-            error_log(' ERROR: rubi->parse('.$text.') return false'); 
+            //return false;
+            $msg = 'error in rubifier->parse('.$text.')';
+            error_log('plugin_'.$this->getPluginName().': '. $msg);
             $ret = false;
         }
         return $ret;
@@ -143,7 +144,9 @@ class helper_plugin_rubifier extends DokuWiki_Plugin {
             $text = array_map('hsc', $annotation);
 
             if (count($base) != count($text)) {
-                error_log(' ERROR: '.$method.' ベース文字数とルビ要素数が一致していません');
+                // ベース文字数とルビ要素数が一致していない場合、Group-rubyとして扱う
+                $msg = 'Wrong '.$method.' ['.implode('-', $text).'] for base ['.$base.']';
+                error_log('plugin_'.$this->getPluginName().': '. $msg);
                 $method = 'Group-ruby';
                 $base = implode('', $base);
                 $annotation[0] = implode('-', $text);
