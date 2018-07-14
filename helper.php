@@ -137,37 +137,40 @@ class helper_plugin_rubifier extends DokuWiki_Plugin {
             return $html;
         }
 
-        // check
+        // ensure any data output has all HTML special characters converted to HTML entities
         if (in_array($method, ['Mono-ruby', 'Jukugo-ruby'])) {
             // convert special characters to HTML entities
-            $base = array_map('hsc', preg_split('//u', $base, -1, PREG_SPLIT_NO_EMPTY));
-            $text = array_map('hsc', $annotation);
+            $html_base = array_map('hsc', preg_split('//u', $base, -1, PREG_SPLIT_NO_EMPTY));
+            $html_text = array_map('hsc', $annotation);
 
-            if (count($base) != count($text)) {
+            if (count($html_base) != count($html_text)) {
                 // ベース文字数とルビ要素数が一致していない場合、Group-rubyとして扱う
-                $msg = 'Wrong '.$method.' ['.implode('-', $text).'] for base ['.$base.']';
+                $html_base = implode('', $html_base);
+                $html_text = implode('-', $html_text);
+                $msg = 'Wrong '.$method.' ['.$html_text.'] for base ['.$html_base.']';
                 error_log('plugin_'.$this->getPluginName().': '. $msg);
                 $method = 'Group-ruby';
-                $base = implode('', $base);
-                $annotation[0] = implode('-', $text);
             }
+        } else { // 'Group-ruby
+            $html_base = hsc($base);
+            $html_text = hsc($annotation[0]);
         }
 
         switch ($method) {
             case 'Mono-ruby':
                 $html = '';
-                for ($i = 0, $c = count($base); $i < $c; $i++) {
-                    $html .= '<rb>'.$base[$i] .$html_rp[0];
-                    $html .= '<rt>'.$text[$i] .$html_rp[1];
+                for ($i = 0, $c = count($html_base); $i < $c; $i++) {
+                    $html .= '<rb>'.$html_base[$i] .$html_rp[0];
+                    $html .= '<rt>'.$html_text[$i] .$html_rp[1];
                 }
                 break;
             case 'Jukugo-ruby':
-                $html = '<rb>'.implode('<rb>', $base) .$html_rp[0];
-                $html.= '<rt>'.implode('<rt>', $text) .$html_rp[1];
+                $html = '<rb>'.implode('<rb>', $html_base) .$html_rp[0];
+                $html.= '<rt>'.implode('<rt>', $html_text) .$html_rp[1];
                 break;
             case 'Group-ruby':
-                $html = '<rb>'.hsc($base)          .$html_rp[0];
-                $html.= '<rt>'.hsc($annotation[0]) .$html_rp[1];
+                $html = '<rb>'.$html_base .$html_rp[0];
+                $html.= '<rt>'.$html_text .$html_rp[1];
                 break;
         } // end of switch
         return '<ruby>'.$html.'</ruby>';
