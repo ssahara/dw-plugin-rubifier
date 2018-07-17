@@ -56,7 +56,9 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
         // ・「全角二重山括弧」《》のかわりに「半角山括弧2回」を使用する
         // ・行頭の「|」がDokuWikiのテーブルマークアップと認識される場合、
         //   バックスラッシュでエスケープする必要がある
-        $this->Lexer->addSpecialPattern('\\\\?\|[^\n|<>]*\<\<[^\n<>]+\>\>', $mode, $this->mode.'alt');
+        // ・「|」の直後にスペースは入らない
+        $pattern_alt = '(?:'.'\\\\?\|\b[^\n|<>]*'.'|'.'\w+'.')\<\<[^\n<>]+\>\>';
+        $this->Lexer->addSpecialPattern($pattern_alt, $mode, $this->mode.'alt');
         $this->Lexer->mapHandler($this->mode.'alt', $this->mode);
     }
 
@@ -67,7 +69,9 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
 
         if (substr($match, -2) == '>>') {
             // 先頭に backslash がある場合 stripslashes() で除去する
-            list($base, $text) = explode('<<', substr(stripslashes($match), 1, -2));
+            list($base, $text) = explode('<<', stripslashes($match));
+            $base = ltrim($base, '|');
+            $text = rtrim($text, '>');
         } else {
             list($base, $text) = preg_split('/《/u', $match, 2);
             $base = preg_replace('/\A[｜]++/u', '', $base); // 先頭の縦棒をltrimする
