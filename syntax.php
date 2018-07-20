@@ -18,9 +18,14 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
 
     protected $mode;
     protected $pattern = [];
+    protected $rubifier; // helper object
 
     function __construct() {
-        $this->mode = substr(get_class($this), 7); // drop 'syntax_' from class name
+        // syntax mode, drop 'syntax_' from class name
+        $this->mode = substr(get_class($this), 7);
+
+        // load helper object
+        $this->rubifier = $this->loadHelper($this->getPluginName());
     }
 
 
@@ -31,35 +36,20 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
      * Connect lookup pattern to lexer
      */
     function connectTo($mode) {
+        $rubify = & $this->rubifier; // helper object
+
         // Japanese syntax pattern
-        static $pattern;
-        if (!isset($pattern)) {
-            // ルビ記法（青空文庫形式）
-            // ・開始記号には全角縦棒を使用する
-            // ・約物（文章で使用される句読点や記号）を含む語句にルビを振ることはない
-            // ・ベースが空白の場合、二重山括弧以降をそのまま出力（ルビ扱いにしない）
-            $base[] = '｜[^\n\p{P}]*';
-
-            // ・ルビのかかる部分が漢字だけの場合、縦棒を省略できる
-            $base[] = '[\p{Han}仝々〆〇ヶ]+';
-            // ・ルビのかかる部分が英字だけで構成される単語の場合、縦棒を省略できる
-            $base[] = '\p{Latin}+';
-
-            // ルビテキストの範囲指定には二重山括弧《》を使用する
-            $pattern = '(?:'. implode('|', $base) . ')《[^\s》]+》';
-        }
         if (in_array('syntax', explode(',', $this->getConf('rubify')))) {
+            $pattern = $rubify->getPattern($this->mode);
             $this->Lexer->addSpecialPattern($pattern, $mode, $this->mode);
         }
 
         // ASCII-based alternative syntax pattern
-        // ・「全角二重山括弧」《》のかわりに「半角山括弧2回」を使用する
-        // ・行頭の「|」がDokuWikiのテーブルマークアップと認識される場合、
-        //   バックスラッシュでエスケープする必要がある
-        // ・「|」の直後にスペースは入らない
-        $pattern_alt = '(?:'.'\\\\?\|\b[^\n|<>]*'.'|'.'\w+'.')\<\<[^\n<>]+\>\>';
-        $this->Lexer->addSpecialPattern($pattern_alt, $mode, $this->mode.'alt');
-        $this->Lexer->mapHandler($this->mode.'alt', $this->mode);
+        alternative: {
+            $pattern_alt = $rubify->getPattern($this->mode.'alt');
+            $this->Lexer->addSpecialPattern($pattern_alt, $mode, $this->mode.'alt');
+            $this->Lexer->mapHandler($this->mode.'alt', $this->mode);
+        }
     }
 
     /**
@@ -86,8 +76,7 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
             return false;
         }
 
-        // load helper object
-        isset($rubify) || $rubify = $this->loadHelper($this->getPluginName());
+        $rubify = & $this->rubifier; // helper object
 
         $method = $rubify->parse($text, $annotation);
         return $data = [$base, $annotation, $method];
@@ -100,8 +89,7 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
 
         list($base, $annotation, $method) = $data;
 
-        // load helper object
-        isset($rubify) || $rubify = $this->loadHelper($this->getPluginName());
+        $rubify = & $this->rubifier; // helper object
 
         if ($format == 'xhtml') {
             // create a ruby annotation
