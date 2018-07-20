@@ -75,24 +75,8 @@ class helper_plugin_rubifier extends DokuWiki_Plugin {
      */
     function convert($source, $format='xhtml') {
 
-        if (!isset($this->pattern)) {
-            // ルビ記法（青空文庫形式）
-            // ・開始記号には全角縦棒を使用する
-            // ・約物（文章で使用される句読点や記号）を含む語句にルビを振ることはない
-            // ・ベースが空白の場合、二重山括弧以降をそのまま出力（ルビ扱いにしない）
-            $base[] = '｜[^\n\p{P}]*';
-
-            // ・ルビのかかる部分が漢字だけの場合、縦棒を省略できる
-            $base[] = '[\p{Han}仝々〆〇ヶ]+';
-            // ・ルビのかかる部分が英字だけで構成される単語の場合、縦棒を省略できる
-            $base[] = '\p{Latin}+';
-
-            // ルビテキストの範囲指定には二重山括弧《》を使用する
-            $this->pattern = '/('. implode('|', $base) . ')'.'《([^\s》]+)》'.'/u';
-        }
-
         $source = preg_replace_callback(
-            $this->pattern,
+            $this->getPattern(),
             function ($matches) {
                 $base = preg_replace('/\A[｜]++/u', '', $matches[1]);
                 $text = $matches[2];
