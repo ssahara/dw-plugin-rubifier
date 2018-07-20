@@ -29,6 +29,47 @@ if (!defined('DOKU_INC')) die();
 class helper_plugin_rubifier extends DokuWiki_Plugin {
 
     /**
+     * ルビ記法（青空文庫形式）の正規表現パターン
+     */
+    function getPattern($mode=null) {
+
+        if ($mode == 'plugin_rubifieralt') goto alternative;
+
+        // ルビ記法（青空文庫形式）
+        // ・ルビテキストは「全角二重山括弧」《》で囲んで指定する
+        // ・ルビベースの開始記号には全角縦棒を使用する
+        // ・約物（文章で使用される句読点や記号）を含む語句にルビを振ることはない
+        // ・ベースが空白の場合、二重山括弧以降をそのまま出力（ルビ扱いにしない）
+        $base[] = '｜[^\n\p{P}]*';
+
+        // ・ルビのかかる部分が漢字だけの場合、縦棒を省略できる
+        $base[] = '[\p{Han}仝々〆〇ヶ]+';
+
+        // ・ルビのかかる部分が英字だけで構成される単語の場合、縦棒を省略できる
+        $base[] = '\p{Latin}+';
+
+        if ($mode == 'plugin_rubifier') {
+            // Syntax component で使用する構文パターン
+            $pattern = '(?:'. implode('|', $base) . ')《[^\s》]+》';
+        } else {
+            // convert() メソッドで使用する検索パターン
+            $pattern = '/('. implode('|', $base) . ')'.'《([^\s》]+)》'.'/u';
+        }
+        return $pattern;
+
+        // ASCII-based alternative syntax pattern
+        // ・「全角二重山括弧」《》のかわりに「半角山括弧2回」を使用する
+        // ・行頭の「|」がDokuWikiのテーブルマークアップと認識される場合、
+        //   バックスラッシュでエスケープする必要がある
+        // ・「|」の直後にスペースは入らない
+        alternative: {
+            $pattern = '(?:'.'\\\\?\|\b[^\n|<>]*'.'|'.'\w+'.')\<\<[^\n<>]+\>\>';
+        }
+        return $pattern;
+    }
+
+
+    /**
      * Wikiソーステキストに含まれるルビ記法（青空文庫形式）をHTMLにコンバートする
      * RENDERER_CONTENT_POSTPROCESS イベントで処理する
      */
