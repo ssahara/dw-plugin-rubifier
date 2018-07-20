@@ -28,20 +28,6 @@ if (!defined('DOKU_INC')) die();
 
 class helper_plugin_rubifier extends DokuWiki_Plugin {
 
-    protected $rp;      // parenthetical fallback
-    protected $pattern; // ルビ記法（青空文庫形式）search pattern
-
-    function __construct() {
-        // get a pair of ruby parentheses
-        if (utf8_strlen($this->getConf('parentheses')) > 1) {
-            $this->rp[0] = utf8_substr($this->getConf('parentheses'), 0, 1);
-            $this->rp[1] = utf8_substr($this->getConf('parentheses'), 1, 1);
-        } else {
-            $this->rp = array();  // set an empty array
-        }
-    }
-
-
     /**
      * Wikiソーステキストに含まれるルビ記法（青空文庫形式）をHTMLにコンバートする
      * RENDERER_CONTENT_POSTPROCESS イベントで処理する
@@ -118,8 +104,12 @@ class helper_plugin_rubifier extends DokuWiki_Plugin {
         // parenthetical fallback for browsers that don't support ruby annotations
         static $html_rp;
         if (!isset($html_rp)) {
-             $html_rp[0] = isset($this->rp[0]) ? '<rp>'.hsc($this->rp[0]) : '';
-             $html_rp[1] = isset($this->rp[1]) ? '<rp>'.hsc($this->rp[1]) : '';
+            if (utf8_strlen($this->getConf('parentheses')) > 1) {
+                $rp[0] = utf8_substr($this->getConf('parentheses'), 0, 1);
+                $rp[1] = utf8_substr($this->getConf('parentheses'), 1, 1);
+            }
+             $html_rp[0] = isset($rp[0]) ? '<rp>'.hsc($rp[0]) : '';
+             $html_rp[1] = isset($rp[1]) ? '<rp>'.hsc($rp[1]) : '';
         }
 
         if (!in_array($method, ['Mono-ruby', 'Jukugo-ruby', 'Group-ruby'])) {
