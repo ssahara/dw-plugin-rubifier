@@ -16,7 +16,7 @@ if(!defined('DOKU_INC')) die();
 class action_plugin_rubifier extends DokuWiki_Action_Plugin {
 
     /**
-     * register the event handlers
+     * Registers a callback function for a given event
      */
     function register(Doku_Event_Handler $controller) {
         if (in_array('action', explode(',', $this->getConf('rubify')))) {

@@ -11,23 +11,16 @@
  * @see also https://www.aozora.gr.jp/aozora-manual/index-input.html#markup
  */
 
-// must be run within Dokuwiki
 if(!defined('DOKU_INC')) die();
 
 class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
 
-    protected $mode;
-    protected $pattern = [];
     protected $rubifier; // helper object
 
     function __construct() {
-        // syntax mode, drop 'syntax_' from class name
-        $this->mode = substr(get_class($this), 7);
-
         // load helper object
         $this->rubifier = $this->loadHelper($this->getPluginName());
     }
-
 
     function getType() { return 'substition'; }
     function getSort() { return 59; } // < Doku_Parser_Mode_table (=60)
@@ -35,6 +28,13 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
     /**
      * Connect lookup pattern to lexer
      */
+    protected $mode, $pattern;
+
+    function preConnect() {
+        // syntax mode, drop 'syntax_' from class name
+        $this->mode = substr(get_class($this), 7);
+    }
+
     function connectTo($mode) {
         $rubify = & $this->rubifier; // helper object
 

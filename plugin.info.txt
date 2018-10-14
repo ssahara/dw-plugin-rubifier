@@ -1,7 +1,7 @@
 base rubifier
 author Satoshi Sahara
 email sahara.satoshi@gmail.com
-date 2018-07-20
+date 2018-10-14
 name Rubifier
 desc Provide a ruby annotation of Aozora-Bunko style markup, which is used to indicate the pronunciation or meaning of the corresponding characters.
 url https://github.com/ssahara/dw-plugin-rubifier
