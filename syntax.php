@@ -11,13 +11,14 @@
  * @see also https://www.aozora.gr.jp/aozora-manual/index-input.html#markup
  */
 
-if(!defined('DOKU_INC')) die();
+if (!defined('DOKU_INC')) die();
 
-class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
-
+class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin
+{
     protected $rubifier; // helper object
 
-    function __construct() {
+    function __construct()
+    {
         // load helper object
         $this->rubifier = $this->loadHelper($this->getPluginName());
     }
@@ -30,12 +31,14 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
      */
     protected $mode, $pattern;
 
-    function preConnect() {
+    function preConnect()
+    {
         // syntax mode, drop 'syntax_' from class name
         $this->mode = substr(get_class($this), 7);
     }
 
-    function connectTo($mode) {
+    function connectTo($mode)
+    {
         $rubify = & $this->rubifier; // helper object
 
         // Japanese syntax pattern
@@ -55,8 +58,8 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, Doku_Handler $handler) {
-
+    function handle($match, $state, $pos, Doku_Handler $handler)
+    {
         if (substr($match, -2) == '>>') {
             // 先頭に backslash がある場合 stripslashes() で除去する
             list($base, $text) = explode('<<', stripslashes($match));
@@ -85,8 +88,8 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    function render($format, Doku_Renderer $renderer, $data) {
-
+    function render($format, Doku_Renderer $renderer, $data)
+    {
         list($base, $annotation, $method) = $data;
 
         $rubify = & $this->rubifier; // helper object
