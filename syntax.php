@@ -75,7 +75,7 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin
         if (empty($base)) {
             // ルビテキスト（括弧も含めて）そのまま出力する
             // prepend zero width space(U+200B) action側での置換防止
-            $handler->_addCall('cdata', ['​'.'《'.$text.'》'], $pos);
+            $handler->base('​'.'《'.$text.'》', DOKU_LEXER_UNMATCHED, $pos);
             return false;
         }
 
