@@ -31,7 +31,7 @@ class helper_plugin_rubifier extends DokuWiki_Plugin
     /**
      * ルビ記法（青空文庫形式）の正規表現パターン
      */
-    function getPattern($mode=null) {
+    public function getPattern($mode=null) {
 
         if ($mode == 'plugin_rubifieralt') goto alternative;
 
@@ -73,7 +73,7 @@ class helper_plugin_rubifier extends DokuWiki_Plugin
      * Wikiソーステキストに含まれるルビ記法（青空文庫形式）をHTMLにコンバートする
      * RENDERER_CONTENT_POSTPROCESS イベントで処理する
      */
-    function convert($source, $format='xhtml')
+    public function convert($source, $format='xhtml')
     {
         $source = preg_replace_callback(
             $this->getPattern(),
@@ -97,7 +97,7 @@ class helper_plugin_rubifier extends DokuWiki_Plugin
      * ルビテキストを「.」または「,」で分解する。
      * 最初の区切り文字が「.」の場合は Mono-ruby、「,」の場合は Jukugo-rubyとして扱う
      */
-    function parse($text, &$annotation=[])
+    public function parse($text, &$annotation=[])
     {
         $c = preg_match_all('/([^.,]+)(?:[.,]?)/u', $text, $matches);
         $annotation = $matches[1];
@@ -125,7 +125,7 @@ class helper_plugin_rubifier extends DokuWiki_Plugin
      * @param string $method         method to treat ruby (option)
      * @return string  html of a ruby annotation
      */
-    function build_html($base, $text, $method=null)
+    public function build_html($base, $text, $method=null)
     {
         // parenthetical fallback for browsers that don't support ruby annotations
         static $html_rp;

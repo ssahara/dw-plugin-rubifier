@@ -23,23 +23,30 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin
         $this->rubifier = $this->loadHelper($this->getPluginName());
     }
 
-    function getType() { return 'substition'; }
-    function getSort() { return 59; } // < Doku_Parser_Mode_table (=60)
+    public function getType()
+    {   // Syntax Type
+        return 'substition';
+    }
+
+    public function getSort()
+    {   // sort number used to determine priority of this mode
+        return 59; // < Doku_Parser_Mode_table (=60)
+    }
 
     /**
      * Connect lookup pattern to lexer
      */
     protected $mode, $pattern;
 
-    function preConnect()
+    public function preConnect()
     {
         // syntax mode, drop 'syntax_' from class name
         $this->mode = substr(get_class($this), 7);
     }
 
-    function connectTo($mode)
+    public function connectTo($mode)
     {
-        $rubify = & $this->rubifier; // helper object
+        $rubify =& $this->rubifier; // helper object
 
         // Japanese syntax pattern
         if (in_array('syntax', explode(',', $this->getConf('rubify')))) {
@@ -58,7 +65,7 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, Doku_Handler $handler)
+    public function handle($match, $state, $pos, Doku_Handler $handler)
     {
         if (substr($match, -2) == '>>') {
             // 先頭に backslash がある場合 stripslashes() で除去する
@@ -79,7 +86,7 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin
             return false;
         }
 
-        $rubify = & $this->rubifier; // helper object
+        $rubify =& $this->rubifier; // helper object
 
         $method = $rubify->parse($text, $annotation);
         return $data = [$base, $annotation, $method];
@@ -88,11 +95,11 @@ class syntax_plugin_rubifier extends DokuWiki_Syntax_Plugin
     /**
      * Create output
      */
-    function render($format, Doku_Renderer $renderer, $data)
+    public function render($format, Doku_Renderer $renderer, $data)
     {
         list($base, $annotation, $method) = $data;
 
-        $rubify = & $this->rubifier; // helper object
+        $rubify =& $this->rubifier; // helper object
 
         if ($format == 'xhtml') {
             // create a ruby annotation

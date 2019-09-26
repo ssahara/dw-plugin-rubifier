@@ -18,7 +18,7 @@ class action_plugin_rubifier extends DokuWiki_Action_Plugin
     /**
      * Registers a callback function for a given event
      */
-    function register(Doku_Event_Handler $controller)
+    public function register(Doku_Event_Handler $controller)
     {
         if (in_array('action', explode(',', $this->getConf('rubify')))) {
             $controller->register_hook(
@@ -32,7 +32,7 @@ class action_plugin_rubifier extends DokuWiki_Action_Plugin
      * Convert rubi-syntax to HTML5 ruby annotation
      * 青空文庫風のルビ記法を実現する。見出し文字列にも適用されます
      */
-    function _rubify(Doku_Event $event)
+    public function _rubify(Doku_Event $event)
     {
         // load helper object
         isset($rubify) || $rubify = $this->loadHelper($this->getPluginName());
