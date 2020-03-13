@@ -11,8 +11,6 @@
  * @see also https://www.aozora.gr.jp/aozora-manual/index-input.html#markup
  */
 
-if (!defined('DOKU_INC')) die();
-
 class action_plugin_rubifier extends DokuWiki_Action_Plugin
 {
     /**

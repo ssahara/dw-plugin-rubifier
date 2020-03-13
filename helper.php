@@ -24,8 +24,6 @@
  * @see also https://www.w3.org/TR/html-ruby-extensions/
  */
 
-if (!defined('DOKU_INC')) die();
-
 class helper_plugin_rubifier extends DokuWiki_Plugin
 {
     /**
